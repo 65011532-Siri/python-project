@@ -16,14 +16,14 @@ class Acc:
         a = int(input())
         if a == 1:
             print("Bank Account")
-            print("total balance =", str(self.bankdatabase[0,-1]))
-            print("total income =", str(self.bankdatabase[0,-1]))
-            print("Total expenses =", str(self.bankdatabase[0,-1]))
+            print("total balance =", self.bankdatabase[0,-1])
+            print("total income =", self.bankdatabase[0,-2])
+            print("Total expenses =", self.bankdatabase[0,-3])
         elif a == 2: 
             print("Cash")
-            print("total balance =", str(self.bankdatabase[0,-1]))
-            print("total income =", str(self.bankdatabase[0,-1]))
-            print("Total expenses =", str(self.bankdatabase[0,-1]))
+            print("total balance =", self.cashdatabase[0,-1])
+            print("total income =", self.cashdatabase[0,-2])
+            print("Total expenses =", self.cashdatabase[0,-3])
 
     def income(self):
         date = dateinput()
