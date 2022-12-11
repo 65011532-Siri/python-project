@@ -1,5 +1,7 @@
 import datetime 
 import numpy as np
+from tkinter import *
+import tkinter.messagebox
 
 
 class Acc:
@@ -109,6 +111,8 @@ class Acc:
         np.savetxt(self.name+"_bankdatabase.txt", self.bankdatabase, fmt="%f")
         np.savetxt(self.name+"_cashdatabase.txt", self.cashdatabase, fmt="%f")
 
+        
+
 
 def dateinput(x = datetime.datetime.now()):
     print("Select date: 1.Today 2.customs day")
@@ -135,41 +139,104 @@ class oldAcc(Acc):
             self.cashdatabase = self.cashdatabase.reshape(1,13)
 
 
-p = True
-name = input("Enter your name: ")
-file = open("acc_database.txt", "r")
-b = len(file.readlines())
-file = open("acc_database.txt", "r")
-accdata = file.readlines()
-for i in range(b):
+def login():
+    name = nameinput.get()
+    name = str(name)
+    p = True
     file = open("acc_database.txt", "r")
-    a = file.readlines()[i]
-    a = a.strip("\n")
-    if name == a:
-        acc_name = oldAcc(name)
-        p = False
-        break
+    b = len(file.readlines())
+    for i in range(b):
+        file = open("acc_database.txt", "r")
+        a = file.readlines()[i]
+        a = a.strip("\n")
+        if name == a:
+            acc_name = oldAcc(name)
+            p = False
+            mainpage(acc_name)
+            break
+    if p == True:
+        tkinter.messagebox.showinfo("Your name is not found", "Your name is not found. \nPlaese register first")
+        
+def register():
+    name = nameinput.get()
+    name = str(name)
+    p = True
+    file = open("acc_database.txt", "r")
+    b = len(file.readlines())
+    file = open("acc_database.txt", "r")
+    accdata = file.readlines()
+    for i in range(b):
+        file = open("acc_database.txt", "r")
+        a = file.readlines()[i]
+        a = a.strip("\n")
+        if name == a:
+            tkinter.messagebox.showinfo("Already have account", "Your name has already register \nPlease login")
+            break
+    if p == True:
+        acc_name = Acc(name)
+        accdata.append(name+"\n")
+        datafile = open("acc_database.txt", "w")
+        k = datafile.writelines(accdata)
+        datafile.close()
+        mainpage(acc_name)
 
-if p == True:
-    acc_name = Acc(name)
-    accdata.append(name+"\n")
-    datafile = open("acc_database.txt", "w")
-    k = datafile.writelines(accdata)
-    datafile.close()
-
-while True:
-    print("Run a command")
-    c = input()
-    if c=='q':
-        print("Done")
-        break
-    elif c=="report":
-        acc_name.report()
-    elif c=="income":
-        acc_name.income()
-    elif c=="expense":
-        acc_name.expense()
-    else:
-        print("Invalid command")
-    acc_name.update_bankdatebase()
+def mainpage(acc_name):
+    root.destroy()
+    root = Tk()
+    root.title("INCOME AND EXPENSE TRACKER")
+    root.geometry("450x400")
+    datelabel = Label(root, text="Date(DD): ", font=("Times", 15)).place(x=20,y=10)
+    dd = IntVar()
+    dateent = Entry(root, textvariable=dd, font=("Times", 15)).place(x=110,y=12,width=27)
+    monthlabel = Label(root, text="Month(MM): ", font=("Times", 15)).place(x=138,y=10)
+    mm = IntVar()
+    monthent = Entry(root, textvariable=mm, font=("Times", 15)).place(x=247,y=12,width=27)
+    yearlabel = Label(root, text="Year(YYYY): ", font=("Times", 15)).place(x=270,y=10)
+    yy = IntVar()
+    yearent = Entry(root, textvariable=yy, font=("Times", 15)).place(x=390,y=12,width=50)
+    acctype = IntVar()
+    Radiobutton(text="1.Bank Account", font=("Times",15), variable=acctype, value=1).place(x=50,y=50)
+    Radiobutton(text="2.Cash", font=("Times",15), variable=acctype, value=2).place(x=275,y=50)
+    amountlabel = Label(root, text="Enter Amount of money", font=("Times", 15)).place(x=105,y=90)
+    amountinput = StringVar()
+    amount = Entry(root, font=("Times", 15), textvariable=amountinput).place(x=100,y=130)
+    cate = IntVar()
+    Radiobutton(text="Salary", font=("Times",15), variable=cate, value=7).place(x=50,y=160)
+    Radiobutton(text="Incoming Transfer", font=("Times",15), variable=cate, value=8).place(x=50,y=190)
+    Radiobutton(text="other income", font=("Times",15), variable=cate, value=9).place(x=50,y=220)
+    Radiobutton(text="Food and Beverage", font=("Times",15), variable=cate, value=1).place(x=225,y=160)
+    Radiobutton(text="Transportation and gas", font=("Times",15), variable=cate, value=2).place(x=225,y=190)
+    Radiobutton(text="Entertainment", font=("Times",15), variable=cate, value=3).place(x=225,y=220)
+    Radiobutton(text="Sport", font=("Times",15), variable=cate, value=4).place(x=225,y=250)
+    Radiobutton(text="Investment", font=("Times",15), variable=cate, value=5).place(x=225,y=280)
+    Radiobutton(text="other expense", font=("Times",15), variable=cate, value=6).place(x=225,y=310)
+    Add = Button(root, text="Add", height=2, width=10, bg="Cyan").place(x=75,y=350)
+    exreport = Button(root, text="Report expenses", height=2, width=13, bg="Red").place(x=175,y=350)
+    inreport = Button(root, text="Report income", height=2, width=13, bg="Green").place(x=295,y=350)
+    root.mainloop()
+    while True:
+        print("Run a command")
+        c = input()
+        if c=='q':
+            print("Done")
+            break
+        elif c=="report":
+            acc_name.report()
+        elif c=="income":
+            acc_name.income()
+        elif c=="expense":
+            acc_name.expense()
+        else:
+            print("Invalid command")
+        acc_name.update_bankdatebase()
     
+
+root = Tk()
+root.title("INCOME AND EXPENSE TRACKER")
+root.geometry("400x300")
+HeadLabel = Label(root,text="Enter your name", fg="Blue", font=("Times",30)).place(x=70,y=30)
+nameinput = StringVar()
+nameent = Entry(root, font=("Times",25), textvariable=nameinput).place(x=30,y=100)
+loginbutton = Button(root, text="Login", height=2, width=10, bg="Cyan", command=login).place(x=80,y=180)
+regbutton = Button(root, text="register", height=2, width=10, bg="Green", command=register).place(x=250,y=180) 
+root.mainloop()
