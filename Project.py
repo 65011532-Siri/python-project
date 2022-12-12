@@ -15,20 +15,6 @@ class Acc:
         np.savetxt(self.name+"_cashdatabase.txt", self.cashdatabase, fmt="%f")
 
 
-    def report(self):
-        print("1.Bank Account or 2.Cash")
-        a = int(input())
-        if a == 1:
-            print("Bank Account")
-            print("total balance =", self.bankdatabase[0,-1])
-            print("total income =", self.bankdatabase[0,-2])
-            print("Total expenses =", self.bankdatabase[0,-3])
-        elif a == 2: 
-            print("Cash")
-            print("total balance =", self.cashdatabase[0,-1])
-            print("total income =", self.cashdatabase[0,-2])
-            print("Total expenses =", self.cashdatabase[0,-3])
-
     def income(self,date,a,b,x):
         date = float(date)
         if a == 1:
@@ -101,20 +87,6 @@ class Acc:
 
         
 
-def dateinput(x = datetime.datetime.now()):
-    print("Select date: 1.Today 2.customs day")
-    i = int(input())
-    if i == 2:
-        print("Enter date: ")
-        dd = int(input())
-        print("Enter month: ")
-        mm = int(input())
-        print("Enter year(20xx): ")
-        yy = int(input())
-        x = datetime.datetime(yy, mm, dd)
-    x = str(x.year)+str(x.month)+str(x.day)
-    return float(x)
-
 class oldAcc(Acc):
     def __init__(self,accname):
         self.name = accname
@@ -130,39 +102,148 @@ def addbutton(name,date):
     acc_name = oldAcc(name)
     acc_type = acctype.get()
     acc_type = int(acc_type)
+    if acc_type == 0:
+        tkinter.messagebox.showinfo("Error","Please Select Account type")
     amountin = amountinput.get()
-    amountin = float(amountin)
+    if amountin == "":
+        tkinter.messagebox.showinfo("Error", "Please Enter Amount of Money")
+    else:
+        amountin = float(amountin)
     x = catetype.get()
     x = str(x)
     x = int(x)
-    if 1 <= x <= 6:
+    if 1 <= x <= 6 and acc_type !=0 and amountin != "":
         acc_name.expense(date,acc_type,amountin,x)
         tkinter.messagebox.showinfo("Your account is updated", "Your expnese has been added")
-    else:
+    elif 7 <= x <= 9 and acc_type !=0 and amountin != "":
         acc_name.income(date,acc_type,amountin,x)
         tkinter.messagebox.showinfo("Your account is updated", "Your income has been added")
+    elif x == 0:
+        tkinter.messagebox.showinfo("Error","Please Select Category")
     acc_name.update_database()
 
 def inrebutton(name):
     acc_name = oldAcc(name)
+    bankre = "Your Bank Account Balance "+str(acc_name.bankdatabase[0,12])
+    tkinter.messagebox.showinfo("Your Balance", bankre)
     Salary = np.sum(acc_name.bankdatabase, axis=0)[7]
     intrans = np.sum(acc_name.bankdatabase, axis=0)[8]
     others = np.sum(acc_name.bankdatabase, axis=0)[9]
     income_sum = [Salary,intrans,others]
-    income_cate = ["Salary", "Incoming transfer", "Others"]
-    exp = [0.1,0.1,0]
+    income_cate = ["Salary", "Incoming Transfer", "Others Income"]
+    exp = [0.1,0.1,0.1]
+    if Salary == 0:
+        income_sum.remove(Salary)
+        income_cate.remove("Salary")
+        exp.remove(0.1)
+    if intrans == 0:
+        income_sum.remove(intrans)
+        income_cate.remove("Incoming Transfer")
+        exp.remove(0.1)
+    if others == 0:
+        income_sum.remove(others)
+        income_cate.remove("Others Income")
+        exp.remove(0.1)
     plt.subplot(2,1,1)
     plt.pie(income_sum, labels=income_cate, autopct="%.1f%%",shadow=True,explode=exp)
     plt.title("BankAccount Income Report", fontsize= 15)
-
     Salary = np.sum(acc_name.cashdatabase, axis=0)[7]
     intrans = np.sum(acc_name.cashdatabase, axis=0)[8]
     others = np.sum(acc_name.cashdatabase, axis=0)[9]
     income_sum = [Salary,intrans,others]
-    income_cate = ["Salary", "Incoming transfer", "Others"]
-    exp = [0.1,0.1,0]
+    income_cate = ["Salary", "Incoming Transfer", "Others Income"]
+    exp = [0.1,0.1,0.1]
+    if Salary == 0:
+        income_sum.remove(Salary)
+        income_cate.remove("Salary")
+        exp.remove(0.1)
+    if intrans == 0:
+        income_sum.remove(intrans)
+        income_cate.remove("Incoming Transfer")
+        exp.remove(0.1)
+    if others == 0:
+        income_sum.remove(others)
+        income_cate.remove("Others Income")
+        exp.remove(0.1)
     plt.subplot(2,1,2)
     plt.pie(income_sum, labels=income_cate, autopct="%.1f%%",shadow=True,explode=exp)
+    plt.title("CashAccount Income Report", fontsize= 15)
+    plt.show()
+
+
+def exrebutton(name):
+    acc_name = oldAcc(name)
+    food = np.sum(acc_name.bankdatabase, axis=0)[1]
+    trans = np.sum(acc_name.bankdatabase, axis=0)[2]
+    enter = np.sum(acc_name.bankdatabase, axis=0)[3]
+    sport = np.sum(acc_name.bankdatabase, axis=0)[4]
+    invest = np.sum(acc_name.bankdatabase, axis=0)[5]
+    other = np.sum(acc_name.bankdatabase, axis=0)[6]
+    expense_sum = [food,trans,enter,sport,invest,other]
+    expense_cate = ["Food and Beverage", "Transportatino and gas", "Entertainment","Sport","Investment","Others Expenses"]
+    exp = [0.1,0.1,0.1,0.1,0.1,0.1]
+    if food == 0:
+        expense_sum.remove(food)
+        expense_cate.remove("Food and Beverage")
+        exp.remove(0.1)
+    if trans == 0:
+        expense_sum.remove(trans)
+        expense_cate.remove("Transportatino and gas")
+        exp.remove(0.1)
+    if enter == 0:
+        expense_sum.remove(enter)
+        expense_cate.remove("Entertainment")
+        exp.remove(0.1)
+    if sport == 0:
+        expense_sum.remove(sport)
+        expense_cate.remove("Sport")
+        exp.remove(0.1)
+    if invest == 0:
+        expense_sum.remove(invest)
+        expense_cate.remove("Investment")
+        exp.remove(0.1)
+    if other == 0:
+        expense_sum.remove(other)
+        expense_cate.remove("Others Expenses")
+        exp.remove(0.1)
+    plt.subplot(2,1,1)
+    plt.pie(expense_sum, labels=expense_cate, autopct="%.1f%%",shadow=True,explode=exp)
+    plt.title("BankAccount Income Report", fontsize= 15)
+    food = np.sum(acc_name.cashdatabase, axis=0)[1]
+    trans = np.sum(acc_name.cashdatabase, axis=0)[2]
+    enter = np.sum(acc_name.cashdatabase, axis=0)[3]
+    sport = np.sum(acc_name.cashdatabase, axis=0)[4]
+    invest = np.sum(acc_name.cashdatabase, axis=0)[5]
+    other = np.sum(acc_name.cashdatabase, axis=0)[6]
+    expense_sum = [food,trans,enter,sport,invest,other]
+    expense_cate = ["Food and Beverage", "Transportatino and gas", "Entertainment","Sport","Investment","Others Expenses"]
+    exp = [0.1,0.1,0.1,0.1,0.1,0.1]
+    if food == 0:
+        expense_sum.remove(food)
+        expense_cate.remove("Food and Beverage")
+        exp.remove(0.1)
+    if trans == 0:
+        expense_sum.remove(trans)
+        expense_cate.remove("Transportatino and gas")
+        exp.remove(0.1)
+    if enter == 0:
+        expense_sum.remove(enter)
+        expense_cate.remove("Entertainment")
+        exp.remove(0.1)
+    if sport == 0:
+        expense_sum.remove(sport)
+        expense_cate.remove("Sport")
+        exp.remove(0.1)
+    if invest == 0:
+        expense_sum.remove(invest)
+        expense_cate.remove("Investment")
+        exp.remove(0.1)
+    if other == 0:
+        expense_sum.remove(other)
+        expense_cate.remove("Others Expenses")
+        exp.remove(0.1)
+    plt.subplot(2,1,2)
+    plt.pie(expense_sum, labels=expense_cate, autopct="%.1f%%",shadow=True,explode=exp)
     plt.title("CashAccount Income Report", fontsize= 15)
     plt.show()
 
@@ -245,9 +326,14 @@ def mainpage(acc_name):
     Radiobutton(text="Sport", font=("Times",15), variable=catetype, value=4).place(x=225,y=250)
     Radiobutton(text="Investment", font=("Times",15), variable=catetype, value=5).place(x=225,y=280)
     Radiobutton(text="other expense", font=("Times",15), variable=catetype, value=6).place(x=225,y=310)
-    Add = Button(main, text="Add", height=2, width=10, bg="Cyan", command=partial(addbutton, acc_name,datein)).place(x=75,y=350)
-    exreport = Button(main, text="Report expenses", height=2, width=13, bg="Red").place(x=175,y=350)
-    inreport = Button(main, text="Report income", height=2, width=13, bg="Green", command=partial(inrebutton, acc_name)).place(x=295,y=350)
+    
+    balancelabel = Label(main, text="Enter Amount of money", font=("Times", 15)).place(x=105,y=90)
+    toinlabel = Label(main, text="Enter Amount of money", font=("Times", 15)).place(x=105,y=90)
+    toexlabel = Label(main, text="Enter Amount of money", font=("Times", 15)).place(x=105,y=90)
+    Add = Button(main, text="Add", height=2, width=10, bg="Cyan", command=partial(addbutton, acc_name,datein)).place(x=27,y=350)
+    exreport = Button(main, text="Report expenses", height=2, width=13, bg="Orange", command=partial(exrebutton, acc_name)).place(x=118,y=350)
+    inreport = Button(main, text="Report income", height=2, width=13, bg="Green", command=partial(inrebutton, acc_name)).place(x=230,y=350)
+    delebutton = Button(main, text="Delete", height=2, width=8, bg="Red", command=partial(inrebutton, acc_name)).place(x=343,y=350)
     main.mainloop()
 
 
