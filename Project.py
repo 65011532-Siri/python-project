@@ -209,7 +209,7 @@ def exrebutton(name):
         exp.remove(0.1)
     plt.subplot(2,1,1)
     plt.pie(expense_sum, labels=expense_cate, autopct="%.1f%%",shadow=True,explode=exp)
-    plt.title("BankAccount Income Report", fontsize= 15)
+    plt.title("BankAccount Expenses Report", fontsize= 15)
     food = np.sum(acc_name.cashdatabase, axis=0)[1]
     trans = np.sum(acc_name.cashdatabase, axis=0)[2]
     enter = np.sum(acc_name.cashdatabase, axis=0)[3]
@@ -245,7 +245,7 @@ def exrebutton(name):
         exp.remove(0.1)
     plt.subplot(2,1,2)
     plt.pie(expense_sum, labels=expense_cate, autopct="%.1f%%",shadow=True,explode=exp)
-    plt.title("CashAccount Income Report", fontsize= 15)
+    plt.title("CashAccount Expenses Report", fontsize= 15)
     plt.show()
 
 def delbutton(name):
@@ -357,7 +357,6 @@ def mainpage(acc_name):
     inreport = Button(main, text="Report income", height=2, width=13, bg="Green", command=partial(inrebutton, acc_name)).place(x=230,y=350)
     delebutton = Button(main, text="Delete", height=2, width=8, bg="Red", command=partial(delbutton, acc_name)).place(x=343,y=350)
     main.mainloop()
-
 
 
 root = Tk()
