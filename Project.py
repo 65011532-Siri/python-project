@@ -82,6 +82,8 @@ class Acc:
         self.cashdatabase[0,-3] = np.sum(np.sum(self.cashdatabase, axis=0)[1:7], axis=0)
         self.cashdatabase[0,-2] = np.sum(np.sum(self.cashdatabase, axis=0)[7:10], axis=0)
         self.cashdatabase[0,-1] = self.cashdatabase[0,-2] - self.cashdatabase[0,-3]
+        self.bankdatabase = self.bankdatabase[self.bankdatabase[:, 0].argsort()]
+        self.cashdatabase = self.cashdatabase[self.cashdatabase[:, 0].argsort()]
         np.savetxt(self.name+"_bankdatabase.txt", self.bankdatabase, fmt="%f")
         np.savetxt(self.name+"_cashdatabase.txt", self.cashdatabase, fmt="%f")
 
@@ -98,10 +100,11 @@ class oldAcc(Acc):
             self.cashdatabase = self.cashdatabase.reshape(1,13)
 
 
-def addbutton(name,date):
+def addbutton(name):
     acc_name = oldAcc(name)
     acc_type = acctype.get()
     acc_type = int(acc_type)
+    date = str(yy.get())+str(mm.get())+str(dd.get())
     if acc_type == 0:
         tkinter.messagebox.showinfo("Error","Please Select Account type")
     amountin = amountinput.get()
@@ -124,8 +127,6 @@ def addbutton(name,date):
 
 def inrebutton(name):
     acc_name = oldAcc(name)
-    bankre = "Your Bank Account Balance "+str(acc_name.bankdatabase[0,12])
-    tkinter.messagebox.showinfo("Your Balance", bankre)
     Salary = np.sum(acc_name.bankdatabase, axis=0)[7]
     intrans = np.sum(acc_name.bankdatabase, axis=0)[8]
     others = np.sum(acc_name.bankdatabase, axis=0)[9]
@@ -247,6 +248,25 @@ def exrebutton(name):
     plt.title("CashAccount Income Report", fontsize= 15)
     plt.show()
 
+def delbutton(name):
+    acc = oldAcc(name)
+    acc_type = acctype.get()
+    date = str(yy.get())+str(mm.get())+str(dd.get())
+    date2 = str(dd.get())+"/"+str(mm.get())+"/"+str(yy.get())
+    textdate = "Are you sure to delete all track in "+str(date2)
+    if acc_type == 0:
+        tkinter.messagebox.showinfo("Error", "Please Select account type")
+    else:
+        ask = tkinter.messagebox.askyesno("Confirmation", textdate)
+        if ask == True and acc_type == 1:
+            acc.bankdatabase = np.delete(acc.bankdatabase, (np.where(acc.bankdatabase == float(date)))[0], axis=0)
+            tkinter.messagebox.showinfo("Complete","Tracks are deleted")
+        elif ask == True and acc_type == 2:
+            acc.cashdatabase = np.delete(acc.cashdatabase, (np.where(acc.cashdatabase == float(date)))[0], axis=0)
+            tkinter.messagebox.showinfo("Complete","Tracks are deleted")
+        elif ask == False:
+            pass
+    acc.update_database()
 
 def login():
     name = nameinput.get()
@@ -292,11 +312,11 @@ def register():
         mainpage(name)
 
 def mainpage(acc_name):
-    global acctype,amountinput,catetype
+    global acctype,amountinput,catetype,dd,mm,yy
     date = datetime.datetime.now()
     main = Tk()
     main.title("INCOME AND EXPENSE TRACKER")
-    main.geometry("450x400")
+    main.geometry("500x500")
     datelabel = Label(main, text="Date(DD): ", font=("Times", 15)).place(x=20,y=10)
     dd = IntVar()
     dd.set(date.day)
@@ -310,6 +330,7 @@ def mainpage(acc_name):
     yy.set(date.year)
     yearent = Entry(main, textvariable=yy, font=("Times", 15)).place(x=390,y=12,width=50)
     datein = str(yy.get())+str(mm.get())+str(dd.get())
+    datein2 = str(dd.get())+"/"+str(mm.get())+"/"+str(yy.get())
     acctype = IntVar()
     Radiobutton(text="1.Bank Account", font=("Times",15), variable=acctype, value=1).place(x=50,y=50)
     Radiobutton(text="2.Cash", font=("Times",15), variable=acctype, value=2).place(x=275,y=50)
@@ -326,14 +347,15 @@ def mainpage(acc_name):
     Radiobutton(text="Sport", font=("Times",15), variable=catetype, value=4).place(x=225,y=250)
     Radiobutton(text="Investment", font=("Times",15), variable=catetype, value=5).place(x=225,y=280)
     Radiobutton(text="other expense", font=("Times",15), variable=catetype, value=6).place(x=225,y=310)
-    
-    balancelabel = Label(main, text="Enter Amount of money", font=("Times", 15)).place(x=105,y=90)
-    toinlabel = Label(main, text="Enter Amount of money", font=("Times", 15)).place(x=105,y=90)
-    toexlabel = Label(main, text="Enter Amount of money", font=("Times", 15)).place(x=105,y=90)
-    Add = Button(main, text="Add", height=2, width=10, bg="Cyan", command=partial(addbutton, acc_name,datein)).place(x=27,y=350)
+    getacc = oldAcc(acc_name)
+    textbank = "Bank: Total Balance: "+ str(getacc.bankdatabase[0,12])+ " Total Expense:  "+ str(getacc.bankdatabase[0,10])+ " Total Income: "+ str(getacc.bankdatabase[0,11])
+    textcash = "Cash: Total Balance: "+ str(getacc.cashdatabase[0,12])+ " Total Expense:  "+ str(getacc.cashdatabase[0,10])+ " Total Income: "+ str(getacc.cashdatabase[0,11])
+    banklabel = Label(main, text=textbank, font=("Times", 11)).place(x=5,y=410)
+    cashlabel = Label(main, text=textcash, font=("Times", 11)).place(x=5,y=460)
+    Add = Button(main, text="Add", height=2, width=10, bg="Cyan", command=partial(addbutton, acc_name)).place(x=27,y=350)
     exreport = Button(main, text="Report expenses", height=2, width=13, bg="Orange", command=partial(exrebutton, acc_name)).place(x=118,y=350)
     inreport = Button(main, text="Report income", height=2, width=13, bg="Green", command=partial(inrebutton, acc_name)).place(x=230,y=350)
-    delebutton = Button(main, text="Delete", height=2, width=8, bg="Red", command=partial(inrebutton, acc_name)).place(x=343,y=350)
+    delebutton = Button(main, text="Delete", height=2, width=8, bg="Red", command=partial(delbutton, acc_name)).place(x=343,y=350)
     main.mainloop()
 
 
